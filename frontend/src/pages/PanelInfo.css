@@ -1,0 +1,153 @@
+.info-panel {
+  z-index: 1300;
+}
+
+.panel-content {
+  padding: 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.panel-title {
+  font-weight: 600;
+  background: linear-gradient(135deg, #2196f3, #21cbf3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.close-button {
+  transition: all 0.3s ease;
+}
+
+.info-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.teneur-section {
+  margin-top: 16px;
+}
+
+.teneur-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.teneur-color-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.teneur-value {
+  font-weight: 700;
+  color: #1976d2;
+}
+
+.teneur-chip {
+  margin-left: auto;
+}
+
+.coordinates-title {
+  display: flex;
+  align-items: center;
+  color: #1976d2;
+}
+
+.coordinate-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.coordinate-item {
+  text-align: center;
+  padding: 12px;
+  background: rgba(33, 150, 243, 0.05);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.coordinate-item:hover {
+  background: rgba(33, 150, 243, 0.1);
+  transform: scale(1.02);
+}
+
+.coordinate-item:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+.coordinate-value {
+  font-family: "Courier New", monospace;
+  font-weight: 600;
+  color: #1565c0;
+  margin-top: 4px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .panel-content {
+    padding: 16px;
+  }
+
+  .coordinate-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .coordinate-item:nth-child(3) {
+    grid-column: auto;
+  }
+
+  .teneur-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .teneur-chip {
+    margin-left: 0;
+  }
+}
+
+/* Smooth animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.info-panel .MuiDrawer-paper {
+  animation: slideIn 0.3s ease-out;
+}

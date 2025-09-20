@@ -1,0 +1,344 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Dark theme colors inspired by the design */
+  --background: #0a0a0a;
+  --surface: #1a1a1a;
+  --surface-elevated: #2a2a2a;
+  --border: #333333;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-muted: #666666;
+  --accent-primary: #f59e0b;
+  --accent-secondary: #fbbf24;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* Light theme colors */
+  --light-background: #ffffff;
+  --light-surface: #f8f9fa;
+  --light-surface-elevated: #ffffff;
+  --light-border: #e5e7eb;
+  --light-text-primary: #111827;
+  --light-text-secondary: #6b7280;
+  --light-text-muted: #9ca3af;
+
+  --radius: 0.5rem;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] {
+  --background: var(--light-background);
+  --surface: var(--light-surface);
+  --surface-elevated: var(--light-surface-elevated);
+  --border: var(--light-border);
+  --text-primary: var(--light-text-primary);
+  --text-secondary: var(--light-text-secondary);
+  --text-muted: var(--light-text-muted);
+}
+
+/* Adding Leaflet CSS imports and fixing map display */
+@import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Updated app layout for navbar */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  /* height: calc(100vh - 64px); Full height minus navbar */
+  height: auto;
+}
+
+/* Modern navbar styles inspired by Vercel/v0 */
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  height: 7%;
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+    justify-content: flex-end; /* pousse le contenu à droite */
+
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.brand-icon {
+  font-size: 24px;
+  filter: drop-shadow(0 0 8px var(--accent-primary));
+}
+
+.brand-text {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar {
+  width: 19%;
+  background-color: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+/* Sidebar prediction form styles */
+.prediction-form-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.predict-button-sidebar {
+  padding: 12px 16px;
+  background: var(--accent-primary);
+  color: var(--background);
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.predict-button-sidebar:hover:not(:disabled) {
+  background: var(--accent-secondary);
+  transform: translateY(-1px);
+}
+
+.predict-button-sidebar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.prediction-result-sidebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--accent-primary);
+  border-radius: 6px;
+}
+
+.prediction-result-sidebar .result-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.prediction-result-sidebar .result-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.main-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  height: calc(100vh - 64px); /* Full height minus navbar */
+}
+
+.main-content > div {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Modern theme toggle inspired by v0 design */
+.theme-toggle-modern {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggle-track {
+  width: 100%;
+  height: 100%;
+  background: var(--border);
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--surface-elevated);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+}
+
+.toggle-thumb.light {
+  left: 2px;
+  background: var(--accent-primary);
+  color: var(--background);
+}
+
+.toggle-thumb.dark {
+  left: 26px;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.theme-toggle-modern:hover .toggle-track {
+  background: var(--surface-elevated);
+}
+
+/* Remove old theme toggle styles */
+.theme-toggle {
+  display: none;
+}
+
+/* Adding essential Leaflet map styles */
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+  background: var(--surface) !important;
+}
+
+.leaflet-control-container {
+  font-family: inherit !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--surface-elevated) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--surface-elevated) !important;
+}
+
+.leaflet-control-layers {
+  background: var(--surface-elevated) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+}
+
+.leaflet-control-layers-toggle {
+  background-color: var(--surface-elevated) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.leaflet-control-zoom a {
+  background-color: var(--surface-elevated) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: var(--accent-primary) !important;
+  color: var(--background) !important;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--error);
+  text-align: center;
+  padding: 20px;
+}
+
+/* Responsive navbar */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 16px;
+    height: 56px;
+  }
+
+  .navbar-center {
+    display: none;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: -100%;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .main-content {
+    width: 100%;
+  }
+}

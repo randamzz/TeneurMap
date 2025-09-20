@@ -1,0 +1,96 @@
+.theme-toggle-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1200;
+}
+
+.theme-toggle {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 60px;
+  height: 60px;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.theme-toggle.dark {
+  background: rgba(30, 30, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toggle-icon-container {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-icon {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+}
+
+.light-icon {
+  color: #ffa726;
+  animation: sunRotate 20s linear infinite;
+}
+
+.dark-icon {
+  color: #5c6bc0;
+  animation: moonGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes sunRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes moonGlow {
+  from {
+    filter: drop-shadow(0 0 5px rgba(92, 107, 192, 0.5));
+  }
+  to {
+    filter: drop-shadow(0 0 15px rgba(92, 107, 192, 0.8));
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .theme-toggle-container {
+    top: 15px;
+    right: 15px;
+  }
+
+  .theme-toggle {
+    width: 50px;
+    height: 50px;
+  }
+
+  .toggle-icon {
+    font-size: 20px;
+  }
+}
+
+/* Active state animation */
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+/* Focus styles for accessibility */
+.theme-toggle:focus {
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
+}
