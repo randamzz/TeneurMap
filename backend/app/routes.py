@@ -42,7 +42,7 @@ Y_MIN, Y_MAX = 5_839_036, 5_840_356
 Z_MIN, Z_MAX = 8764, 10204
 
 @router.post("/predict")
-async def predict(request: Request):
+async def predict(request: Request, db: Session = Depends(get_db)):
     data = await request.json()
 
     try:
@@ -69,5 +69,5 @@ async def predict(request: Request):
             raise HTTPException(status_code=400, detail="Format invalide pour X, Y ou Z")
 
     # Appel du service
-    result = make_prediction(x, y, z)
+    result = make_prediction(x, y, z, db)
     return {"prediction": result}
