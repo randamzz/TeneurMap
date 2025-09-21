@@ -2,7 +2,7 @@
 
 ## Description du Projet
 
-TeneurMap MA est une application web innovante conçue spécifiquement pour la visualisation et l'analyse des données minières au Maroc. Cette plateforme permet de visualiser interactivement les coordonnées (x, y, z) et les pourcentages de teneur des échantillons miniers, avec une intégration de fonctionnalités de prédiction avancées utilisant modèle de machine learning.
+TeneurMap MA est une application web innovante conçue spécifiquement pour la visualisation et prediction des données minières au Maroc. Cette plateforme permet de visualiser interactivement les coordonnées (x, y, z) et les pourcentages de teneur des échantillons miniers, avec une intégration de fonctionnalités de prédiction avancées utilisant modèle de machine learning.
 
 ## Objectifs Principaux
 
@@ -27,6 +27,9 @@ TeneurMap MA est une application web innovante conçue spécifiquement pour la v
 - **Partie Machine Learning** :
 
 ## Structure du Projet
+```
+
+TeneurMap/
 │
 ├─ backend/ 
 │ ├─ app/
@@ -42,7 +45,7 @@ TeneurMap MA est une application web innovante conçue spécifiquement pour la v
 │ ├─ data/ # Données CSV d'entrée
 │ ├─ ml/
 │ │ ├─ predict.ipynb # Notebook pour prédictions et tests ML
-│ │ └─ model.pkl # Modèle ML pré-entraîné
+│ │ └─ xgb_model_test5.pkl # Modèle ML pré-entraîné
 │ │
 │ ├─ venv/ 
 │ ├─ Dockerfile 
@@ -51,11 +54,9 @@ TeneurMap MA est une application web innovante conçue spécifiquement pour la v
 ├─ frontend/ # Frontend React
 ├─ Docker-compose #Pour orchestrer et lancer facilement tous les conteneurs 
 ├─ .gitignore 
-└─ README.md 
+└─ README.md
 
-
-
-
+```
 
 ## Lancement du Projet
 
