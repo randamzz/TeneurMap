@@ -24,7 +24,7 @@ TeneurMap MA est une application web innovante conçue spécifiquement pour la v
 - **Backend** : FastAPI - Framework Python moderne et haute performance
 - **Frontend** : React - Bibliothèque JavaScript pour interfaces utilisateur dynamiques
 - **Base de Données** : PostgreSQL - Système de gestion de base de données relationnelle robuste
-- **Partie Machine Learning** :
+- **Machine Learning** : XGBoost intégré avec Scikit-learn - Modèle de gradient boosting optimisé pour la prédiction et facilement exploitable via l’API
 
 ## Structure du Projet
 ```
@@ -128,6 +128,17 @@ Vous pouvez tester les endpoints en accédant à : [http://localhost:8000/docs](
 | `/data`         | GET     | Récupère toutes les données de forage       |
 | `/predict`      | POST    | Prédit la teneur en fonction des données fournies |
 
+
+## Machine Learning : XGBoost avec Scikit-learn
+
+- **Analyse exploratoire approfondie** : étude statistique et visuelle des données de forage, mise en évidence des tendances spatiales et des corrélations entre variables.  
+- **Prétraitement rigoureux** : normalisation des coordonnées pour stabiliser l’apprentissage et intégration de la méthode **IDW (Inverse Distance Weighting)** afin de renforcer la dimension géospatiale des données.  
+- **Modélisation avancée** : utilisation de **XGBoost Regressor**, reconnu pour sa performance sur les données tabulaires, avec une optimisation fine des hyperparamètres via **RandomizedSearchCV**.  
+- **Résultats significatifs** :  
+  - Amélioration claire des prédictions après ajout de l’IDW.  
+  - Le modèle atteint une **précision de plus de 97% (R² > 0.9703)**, confirmant la pertinence de notre approche.  
+
+=>en combinant analyse exploratoire, méthodes géospatiales (IDW) et algorithme performant (XGBoost), nous avons construit un modèle **fiable, robuste et scientifiquement justifié** pour la prédiction de la teneur.
 
 ## Améliorations et Fonctionnalités Futures
 
