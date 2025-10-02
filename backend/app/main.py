@@ -6,6 +6,9 @@ from fastapi.middleware.gzip import GZipMiddleware
 from .routes import router
 from .database import engine
 
+# from routes import router
+# from database import engine
+
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 

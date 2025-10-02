@@ -98,19 +98,20 @@ const MapContainer = ({ data, selectedPoint, onPointSelect, theme }) => {
   }, [theme])
 
   const initializeMap = () => {
-    const moroccoCenter = [31.7917, -7.0926] // Centre du Maroc
-    const moroccoSouthWest = [20.0, -18.0] // Coin sud-ouest du Maroc élargi
-    const moroccoNorthEast = [37.0, 0.0] // Coin nord-est du Maroc élargi
+    // Canada center and bounds
+    const canadaCenter = [56.1304, -106.3468] // Center of Canada
+    const canadaSouthWest = [41.0, -141.0] // Southwest bounds
+    const canadaNorthEast = [83.0, -52.0] // Northeast bounds
 
     const map = L.map(mapRef.current, {
-      center: moroccoCenter,
-      zoom: 6,
-      minZoom: 4,
+      center: canadaCenter,
+      zoom: 4,
+      minZoom: 3,
       maxZoom: 18,
       zoomControl: true,
       attributionControl: true,
-      preferCanvas: true, // Utiliser Canvas pour de meilleures performances
-      maxBounds: [moroccoSouthWest, moroccoNorthEast],
+      preferCanvas: true,
+      maxBounds: [canadaSouthWest, canadaNorthEast],
       maxBoundsViscosity: 0.8,
     })
 
@@ -131,27 +132,25 @@ const MapContainer = ({ data, selectedPoint, onPointSelect, theme }) => {
     }
     L.control.layers(baseLayers).addTo(map)
 
-    // Initialiser le cluster de marqueurs avec la syntaxe correcte
-// Initialiser le cluster de marqueurs avec la syntaxe correcte
-markersRef.current = L.markerClusterGroup({
-  chunkedLoading: true,
-  chunkInterval: 100,
-  maxClusterRadius: 80,
-  spiderfyOnMaxZoom: true,
-  showCoverageOnHover: true,
-  zoomToBoundsOnClick: true,
-  disableClusteringAtZoom: 16,
-  iconCreateFunction: function (cluster) {
-    const count = cluster.getChildCount()
-    const color = getClusterColor(count)
-    return L.divIcon({
-      html: `<div style="background-color: ${color}; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; color: white; font-weight: bold;">${count}</div>`,
-      className: 'marker-cluster-custom',
-      iconSize: L.point(40, 40)
+    // Initialiser le cluster de marqueurs
+    markersRef.current = L.markerClusterGroup({
+      chunkedLoading: true,
+      chunkInterval: 100,
+      maxClusterRadius: 80,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: true,
+      zoomToBoundsOnClick: true,
+      disableClusteringAtZoom: 16,
+      iconCreateFunction: function (cluster) {
+        const count = cluster.getChildCount()
+        const color = getClusterColor(count)
+        return L.divIcon({
+          html: `<div style="background-color: ${color}; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; color: white; font-weight: bold;">${count}</div>`,
+          className: 'marker-cluster-custom',
+          iconSize: L.point(40, 40)
+        })
+      }
     })
-  }
-})
-
 
     mapInstanceRef.current = map
 
@@ -218,61 +217,29 @@ markersRef.current = L.markerClusterGroup({
     try {
       let lat, lng
 
-      // Déterminer la zone UTM basée sur les coordonnées X (Easting)
-      if (point.X < 500000) {
-        // Zone UTM 29N (ouest du Maroc)
-        const falseEasting = 500000
-        const falseNorthing = 0
-        const centralMeridian = -9 // Méridien central pour UTM 29N
-
-        const x = point.X - falseEasting
-        const y = point.Y - falseNorthing
-
-        lat = y / 111320 + 0
-        lng = x / (111320 * Math.cos((32 * Math.PI) / 180)) + centralMeridian
+      // For Canada, we'll handle different UTM zones
+      // Canada spans UTM zones 7 through 22
+      if (point.X >= 500000 && point.X < 1000000) {
+        // Typical UTM coordinates for Canada
+        // Convert UTM to lat/lng - this is a simplified conversion
+        // In production, you'd use a proper UTM conversion library
+        const zone = determineUTMZone(point.X, point.Y);
+        ({lat, lng} = convertUTMToLatLng(point.X, point.Y, zone, 'N'));
       } else {
-        // Zone UTM 30N (est du Maroc)
-        const falseEasting = 500000
-        const falseNorthing = 0
-        const centralMeridian = -3 // Méridien central pour UTM 30N
-
-        const x = point.X - falseEasting
-        const y = point.Y - falseNorthing
-
-        lat = y / 111320 + 0
-        lng = x / (111320 * Math.cos((32 * Math.PI) / 180)) + centralMeridian
+        // If coordinates are already in lat/lng or different format
+        lat = point.Y
+        lng = point.X
       }
 
-      // Limites approximatives du Maroc: 21°N-36°N, 17°W-1°W
-      if (lat < 21.0 || lat > 36.0 || lng < -17.0 || lng > -1.0) {
+      // Canada bounds validation
+      if (lat < 41.0 || lat > 83.0 || lng < -141.0 || lng > -52.0) {
         console.warn(
-          `[v0] Point ${point.id} hors limites: UTM(${point.X}, ${point.Y}) -> GPS(${lat.toFixed(6)}, ${lng.toFixed(6)})`
+          `[v0] Point ${point.id} hors limites du Canada: (${lat.toFixed(6)}, ${lng.toFixed(6)})`
         )
-
-        // Inverser X et Y si nécessaire
-        if (Math.abs(lat) > 90 || Math.abs(lng) > 180) {
-          const tempX = point.Y
-          const tempY = point.X
-
-          if (tempX < 500000) {
-            const x = tempX - 500000
-            const y = tempY - 0
-            lat = y / 111320 + 0
-            lng = x / (111320 * Math.cos((32 * Math.PI) / 180)) + -9
-          } else {
-            const x = tempX - 500000
-            const y = tempY - 0
-            lat = y / 111320 + 0
-            lng = x / (111320 * Math.cos((32 * Math.PI) / 180)) + -3
-          }
-        }
-
-        if (lat < 21.0 || lat > 36.0 || lng < -17.0 || lng > -1.0) {
-          console.warn(`[v0] Utilisation de coordonnées par défaut pour le point ${point.id}`)
-          // Position par défaut dans la région minière du Maroc (région de Khouribga)
-          lat = 32.8811 + (Math.random() - 0.5) * 0.1
-          lng = -6.9063 + (Math.random() - 0.5) * 0.1
-        }
+        
+        // Use a default position in Canada (central region)
+        lat = 56.1304 + (Math.random() - 0.5) * 2
+        lng = -106.3468 + (Math.random() - 0.5) * 2
       }
 
       const color = getColorByTeneur(point.teneur)
@@ -299,26 +266,26 @@ markersRef.current = L.markerClusterGroup({
         `
         <div style="color: ${popupTextColor}; font-family: -apple-system, BlinkMacSystemFont, sans-serif; min-width: 200px; background:${popupBgColor}; padding:10px; border-radius:8px; border:1px solid ${popupBorderColor};">
           <h3 style="margin: 0 0 12px 0; color: ${popupTitleColor}; border-bottom: 2px solid ${color}; padding-bottom: 4px;">
-            Point Minier #${point.id}
+            Mining Point #${point.id}
           </h3>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
             <div>
-              <p style="margin: 2px 0; font-weight: bold; color: ${popupSubColor};">Coordonnées UTM:</p>
-              <p style="margin: 2px 0; font-size: 12px;">X: ${point.X.toFixed(2)} m</p>
-              <p style="margin: 2px 0; font-size: 12px;">Y: ${point.Y.toFixed(2)} m</p>
+              <p style="margin: 2px 0; font-weight: bold; color: ${popupSubColor};">Coordinates:</p>
+              <p style="margin: 2px 0; font-size: 12px;">X: ${point.X.toFixed(2)}</p>
+              <p style="margin: 2px 0; font-size: 12px;">Y: ${point.Y.toFixed(2)}</p>
               <p style="margin: 2px 0; font-size: 12px;">Z: ${point.Z.toFixed(2)} m</p>
             </div>
             <div>
-              <p style="margin: 2px 0; font-weight: bold; color: ${popupSubColor};">Coordonnées GPS:</p>
+              <p style="margin: 2px 0; font-weight: bold; color: ${popupSubColor};">GPS Coordinates:</p>
               <p style="margin: 2px 0; font-size: 12px;">Lat: ${lat.toFixed(6)}°</p>
               <p style="margin: 2px 0; font-size: 12px;">Lng: ${lng.toFixed(6)}°</p>
             </div>
           </div>
           <div style="background: ${color}; color: white; padding: 8px; border-radius: 4px; text-align: center;">
-            <strong>Teneur: ${point.teneur.toFixed(3)}%</strong>
+            <strong>Grade: ${point.teneur.toFixed(3)}%</strong>
           </div>
           <p style="margin: 8px 0 0 0; font-size: 11px; color: ${popupSubColor}; text-align: center;">
-            Zone UTM: ${point.X < 500000 ? "29N" : "30N"} | Altitude: ${point.Z.toFixed(1)}m
+            Location: Canada | Elevation: ${point.Z.toFixed(1)}m
           </p>
         </div>
       `,
@@ -355,6 +322,31 @@ markersRef.current = L.markerClusterGroup({
     }
   }
 
+  // Helper function to determine UTM zone
+  const determineUTMZone = (easting, northing) => {
+    // Simplified UTM zone determination for Canada
+    // Canada spans zones 7-22, but most mining data will be in specific zones
+    // You may need to adjust this based on your actual data distribution
+    return Math.floor((easting / 100000)) + 7;
+  }
+
+  // Simplified UTM to Lat/Lng conversion
+  const convertUTMToLatLng = (easting, northing, zone, hemisphere = 'N') => {
+    // This is a very simplified conversion
+    // In production, use a proper library like proj4 or geodesy
+    const falseEasting = 500000;
+    const centralMeridian = -183 + (zone * 6);
+    
+    const x = easting - falseEasting;
+    const y = northing;
+    
+    // Simplified conversion (approximate)
+    const lat = 56.0 + (y / 111320) * 0.5;
+    const lng = centralMeridian + (x / (111320 * Math.cos((lat * Math.PI) / 180)));
+    
+    return { lat, lng };
+  }
+
   const getColorByTeneur = (teneur) => {
     const normalized = Math.max(0, Math.min(1, (teneur - 2.1328) / (13.456 - 2.1328)))
 
@@ -376,11 +368,10 @@ markersRef.current = L.markerClusterGroup({
   const highlightSelectedPoint = () => {
     if (!markersRef.current || !selectedPoint) return
 
-    // Pour trouver le marqueur sélectionné dans les clusters
     markersRef.current.eachLayer((layer) => {
       if (layer instanceof L.CircleMarker && layer._popup && layer._popup._content) {
         const content = layer._popup._content
-        const match = content.match(/Point Minier #(\d+)/)
+        const match = content.match(/Mining Point #(\d+)/)
         
         if (match && parseInt(match[1]) === selectedPoint.id) {
           // Zoomer sur le point sélectionné
@@ -445,7 +436,7 @@ markersRef.current = L.markerClusterGroup({
               animation: "spin 1s linear infinite",
             }}
           ></div>
-          Chargement des points... ({progress}%)
+          Loading points... ({progress}%)
         </div>
       )}
 

@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
-from .services import get_all_forage_data , make_prediction
+# from services import get_all_forage_data, make_prediction
+# from database import SessionLocal
+from .services import get_all_forage_data, make_prediction
 from .database import SessionLocal
-
 router = APIRouter()
 
 # Dépendance pour obtenir une session
@@ -23,7 +24,7 @@ def read_forage_data(db: Session = Depends(get_db)):
         data = get_all_forage_data(db)
         result = [
             {
-                "id":row.id,
+                "id": row.id,
                 "X": row.X,
                 "Y": row.Y,
                 "Z": row.Z,
@@ -34,7 +35,6 @@ def read_forage_data(db: Session = Depends(get_db)):
         return JSONResponse(content=result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # Limites des valeurs
 X_MIN, X_MAX = 426218, 427378
@@ -53,7 +53,7 @@ async def predict(request: Request, db: Session = Depends(get_db)):
     except (TypeError, ValueError):
         raise HTTPException(status_code=400, detail="X, Y, Z doivent être des nombres valides")
 
-    # Validation des limites
+    # Validation des limites pour Canada
     if not (X_MIN <= x <= X_MAX):
         raise HTTPException(status_code=400, detail=f"X doit être entre {X_MIN} et {X_MAX}")
     if not (Y_MIN <= y <= Y_MAX):

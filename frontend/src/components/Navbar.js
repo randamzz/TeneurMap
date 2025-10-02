@@ -24,7 +24,7 @@ const Navbar = ({ theme, onToggle }) => {
     <nav className="navbar">
       <div className="navbar-title">
         <h1>Données Minières</h1>
-        <p>Visualisation des teneurs au Maroc</p>
+        <p>Visualisation des teneurs </p>
       </div>
 
       <div className="navbar-actions">
